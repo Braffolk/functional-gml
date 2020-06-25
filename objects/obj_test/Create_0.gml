@@ -11,7 +11,7 @@ function assert(_bool, _message) {
 
 var tests = [
 
-	// PIPE TESTS
+	// Array pipes
 	[
 		function() {
 			var _pipe = pipe([], FType.Array);
@@ -28,8 +28,8 @@ var tests = [
 			delete _pipe;
 		}, 
 		true, 
-		"pipe map successful", 
-		"failed to map pipe"
+		"array pipe map successful", 
+		"failed to map array pipe"
 	],
 	[
 		function() {
@@ -38,8 +38,8 @@ var tests = [
 			delete _pipe;
 		}, 
 		true, 
-		"pipe flatmap successful", 
-		"failed to flatmap pipe"
+		"array pipe flatmap successful", 
+		"failed to flatmap array pipe"
 	],
 	[
 		function() {
@@ -48,8 +48,8 @@ var tests = [
 			delete _pipe;
 		}, 
 		true, 
-		"pipe flatten successful", 
-		"failed to flatten pipe"
+		"array pipe flatten successful", 
+		"failed to flatten array pipe"
 	],
 	[
 		function() {
@@ -57,8 +57,8 @@ var tests = [
 			assert(v == 10);
 		}, 
 		true, 
-		"pipe reduce sum successful", 
-		"failed to get sum of pipe using reduce"
+		"array pipe reduce sum successful", 
+		"failed to get sum of array pipe using reduce"
 	],
 	[
 		function() {
@@ -69,8 +69,8 @@ var tests = [
 			assert(array_equals(_result.data(), [[1, "a"], [2, "b"]]));
 		}, 
 		true, 
-		"iterator zip successful", 
-		"failed to zip iterators"
+		"array iterator zip successful", 
+		"failed to zip array iterators"
 	],
 	[
 		function() {
@@ -83,8 +83,8 @@ var tests = [
 			), "found " + string(_pipe.data()));
 		}, 
 		true, 
-		"pipe extend successful", 
-		"pipe extend failed"
+		"array pipe extend successful", 
+		"array pipe extend failed"
 	],
 	[
 		function() {
@@ -95,8 +95,8 @@ var tests = [
 			));
 		}, 
 		true, 
-		"pipe filter successful", 
-		"pipe filter failed"
+		"array pipe filter successful", 
+		"array pipe filter failed"
 	],
 	[
 		function() {
@@ -105,13 +105,130 @@ var tests = [
 			assert(array_equals(_map[? 1 ].data(), [2, 4]));
 		}, 
 		true, 
-		"pipe group by successful", 
-		"pipe group by failed"
+		"array pipe group by successful", 
+		"array pipe group by failed"
 	],
+	
+	
+	
+	
+	
+	
+	
+	// LIST PIPES
+	[
+		function() {
+			var _pipe = pipe(ds_list_create(), FType.List);
+			delete _pipe;
+		}, 
+		true, 
+		"simple pipe list successfully created", 
+		"couldnt create simple pipe list"
+	],
+	[
+		function() {
+			var _pipe = pipe(array_to_list([1, 2, 3]), FType.List).map(function(v){return v + 1;});
+			assert(array_equals(list_to_array(_pipe.data()), [2, 3, 4]));
+			delete _pipe;
+		}, 
+		true, 
+		"list pipe map successful", 
+		"failed to map list pipe"
+	],
+	[
+		function() {
+			var _l = ds_list_create();
+			ds_list_add(_l, array_to_list([1, 2]));
+			ds_list_add(_l, array_to_list([3, 4]));
+			var _pipe = pipe(_l, FType.List).flat_map(function(v){ return v + 1; });
+			assert(array_equals(list_to_array(_pipe.data()), [2, 3, 4, 5]));
+			delete _pipe;
+		}, 
+		true, 
+		"list pipe flatmap successful", 
+		"failed to flatmap list pipe"
+	],
+	[
+		function() {
+			var _l = ds_list_create();
+			ds_list_add(_l, array_to_list([1, 2]));
+			ds_list_add(_l, array_to_list([3, 4]));
+			var _pipe = pipe(_l, FType.List).flatten();
+			assert(array_equals(list_to_array(_pipe.data()), [1, 2, 3, 4]));
+			delete _pipe;
+		}, 
+		true, 
+		"list pipe flatten successful", 
+		"failed to flatten list pipe"
+	],
+	[
+		function() {
+			var v = pipe(array_to_list([1, 2, 3, 4]), FType.List).reduce(function(l, r){return l + r;}, 0);
+			assert(v == 10);
+		}, 
+		true, 
+		"list pipe reduce sum successful", 
+		"failed to get sum of list pipe using reduce"
+	],
+	[
+		function() {
+			var i1 = new Iterator(array_to_list([1, 2]), FType.List);
+			var i2 = new Iterator(array_to_list(["a", "b", "c"]), FType.List);
+			var _result = iterator_zip(i1, i2);
+			var _data = _result.data();
+			assert(array_equals(list_to_array(_data[|0]), [1, "a"]));
+			assert(array_equals(list_to_array(_data[|1]), [2, "b"]));
+		}, 
+		true, 
+		"list iterator zip successful", 
+		"failed to zip list iterators"
+	],
+	/*[
+		function() {
+			var _pipe = pipe([1, 2], FType.Array);
+			var _it = new Iterator([2, 3], FType.Array);
+			_pipe.extend(_it);
+			assert(array_equals(
+				_pipe.data(),
+				[1, 2, 2, 3]
+			), "found " + string(_pipe.data()));
+		}, 
+		true, 
+		"array pipe extend successful", 
+		"array pipe extend failed"
+	],
+	[
+		function() {
+			var _pipe = pipe([1, 2, 3, 4], FType.Array).filter(function(v){return v%2 == 0;});
+			assert(array_equals(
+				_pipe.data(),
+				[2, 4]
+			));
+		}, 
+		true, 
+		"array pipe filter successful", 
+		"array pipe filter failed"
+	],
+	[
+		function() {
+			var _map = pipe([1, 2, 3, 4], FType.Array).group_by(function(v){return v%2 == 0;});
+			assert(array_equals(_map[? 0 ].data(), [1, 3]));
+			assert(array_equals(_map[? 1 ].data(), [2, 4]));
+		}, 
+		true, 
+		"array pipe group by successful", 
+		"array pipe group by failed"
+	],
+	*/
+	
+	
+	
+	
 	[
 		function() {
 			
 			/*Buffer support not yet implemented! To-DO*/
+			
 			/*var _map = pipe(buffer_create(64, buffer_fixed, 4), FType.Buffer)
 				.map(function(v, i){ return i; })
 				.extend(new Iterator([64, 65, 66], FType.Array))

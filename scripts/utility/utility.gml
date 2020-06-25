@@ -41,3 +41,19 @@ function log() {
 	}
 	show_debug_message(out);
 }
+
+function array_to_list(_array) {
+	var l = ds_list_create();
+	for(var i = 0; i < array_length(_array); i++){
+		ds_list_add(l,  _array[ i ]);
+	}
+	return l;
+}
+
+function list_to_array(_list) {
+	var _ar = array_create(ds_list_size(_list));
+	for(var i = 0; i < ds_list_size(_list); i++){
+		_ar[i] = _list[| i ];
+	}
+	return _ar;
+}

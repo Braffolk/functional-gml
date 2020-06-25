@@ -2,25 +2,47 @@
 
 enum FType {
 	Array,
-	Buffer,
+	List,
 	__size
 }
 
 
 global._it_create = array_create(FType.__size);
 global._it_create[FType.Array] = function(_size, _value) { return array_create(_size, _value); }
+global._it_create[FType.List] = function(_size, _value) {
+	var l = ds_list_create();
+	if(_size > 0){
+		l[| _size - 1] = 0;
+	}
+	return l;
+}
 
 global._it_get = array_create(FType.__size);
 global._it_get[FType.Array] = function(_iterable, _pos) { return _iterable[_pos]; }
+global._it_get[FType.List] = function(_iterable, _pos) { return _iterable[|_pos]; }
 
 global._it_set = array_create(FType.__size);
 global._it_set[FType.Array] = function(_iterable, _pos, _val) { _iterable[@ _pos] = _val; }
+global._it_set[FType.List] = function(_iterable, _pos, _val) { _iterable[| _pos] = _val; }
 
 global._it_size = array_create(FType.__size);
 global._it_size[FType.Array] = function(_iterable) { return array_length(_iterable); }
+global._it_size[FType.List] = function(_iterable) { return ds_list_size(_iterable); }
 
 global._it_resize = array_create(FType.__size);
 global._it_resize[FType.Array] = function(_iterable, _size) { array_resize(_iterable, _size); }
+global._it_resize[FType.List] = function(_iterable, _size) {
+	var _it_size = ds_list_size(_iterable);
+	if(_size > _it_size){
+		for(var i = 0; i < _size - _it_size; i++){
+			ds_list_add(_iterable, 0);
+		}
+	} else if(_size < _it_size){
+		for(var i = _size; i < _it_size; i++){
+			ds_list_delete(_iterable, _size);
+		}
+	}
+}
 
 
 function Iterator(_iterable, _type) constructor {
